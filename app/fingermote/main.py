@@ -48,6 +48,7 @@ def main():
                 points = np.array([[new_fingermote_rect[0], new_fingermote_rect[1]]], dtype='int32')
             else:
                 points = np.concatenate((points, [[new_fingermote_rect[0], new_fingermote_rect[1]]]))
+                
             fingermote_rect = new_fingermote_rect
 
         else:
