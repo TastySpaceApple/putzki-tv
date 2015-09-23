@@ -40,26 +40,17 @@ def main():
                 for cnt in contours:
                     rect = cv2.boundingRect(cnt)
                     d = dist(rect[0], rect[1], fingermote_rect[0], fingermote_rect[1])
-                    if(d < min_dist and
-                            abs(new_fingermote_rect[3] - fingermote_rect[3]) < abs(rect[3] - fingermote_rect[3])):
-                        min_dist = d
-                        new_fingermote_rect = rect
+                    min_dist = d
+                    new_fingermote_rect = rect
 
-            if(False):
-                frame_missing += 1
+            frame_missing = 0
+            if(points is None):
+                points = np.array([[new_fingermote_rect[0], new_fingermote_rect[1]]], dtype='int32')
             else:
-                frame_missing = 0
-                if(points is None):
-                    points = np.array([[new_fingermote_rect[0], new_fingermote_rect[1]]], dtype='int32')
-                else:
-                    points = np.concatenate((points, [[new_fingermote_rect[0], new_fingermote_rect[1]]]))
-                fingermote_rect = new_fingermote_rect
+                points = np.concatenate((points, [[new_fingermote_rect[0], new_fingermote_rect[1]]]))
+            fingermote_rect = new_fingermote_rect
 
         else:
-            if(frame_missing < 5):
-                frame_missing += 1
-
-        if(frame_missing == 5):
             if(not points is None and len(points) > 3):
                 if(points[0][0] < points[len(points)-1][0]):
                     print "right"

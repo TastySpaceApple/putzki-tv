@@ -23,7 +23,7 @@
 		  document.body.appendChild(main_screen);
 		  show_collection = new TVShowCollection(shows);
 		  main_screen.appendChild(show_collection.dom);
-		  //document.body.webkitRequestFullscreen();
+		  main_screen.webkitRequestFullscreen();
 		});
 
 		function TVShowCollection(shows_info){
