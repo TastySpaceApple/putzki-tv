@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn;
 	exports.on_fingermote = function(callback){
 		fingermote_callback = callback;
 
-			var fingermote = spawn('python', ['G:\\Workspace\\nodejs\\PutzkiTV\\app\\fingermote\\main.py']);
+			var fingermote = spawn('python', ['app/fingermote/main.py']);
 			fingermote.stdout.setEncoding('utf8');
 			fingermote.stdout.pipe(process.stdout);
 			fingermote.stdout.on('data', function(data){
