@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello Node-webkit!</title>
+	<link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+  <body>
+	<button onclick="show_collection.scrollLeft()">left</button>
+	<button onclick="show_collection.scrollRight()">right</button>
+	<script type="text/javascript">
+		
+		var eztv = require('eztvapi')();
+		
+		var show_collection;
+
+
+		var main_screen;
+
+		eztv.getShows(1, function (err, shows) {
+		  if (err) { return console.log('No such page or something went wrong'); }
+		  main_screen = document.createElement('div');
+		  main_screen.className = "screen";
+		  document.body.appendChild(main_screen);
+		  show_collection = new TVShowCollection(shows);
+		  main_screen.appendChild(show_collection.dom);
+		  //document.body.webkitRequestFullscreen();
+		});
+
+		function TVShowCollection(shows_info){
+			var index = 0;
+			var dom = document.createElement('div')
+			dom.className = "tv-show-bar"
+			var ul = document.createElement('ul')
+			dom.appendChild(ul);
+			var shows = []
+			console.log(shows_info);
+			for(var i=0; i<shows_info.length; i++){
+				var show = new TVShowInfoBox(shows_info[i])
+				shows.push(show);
+				ul.appendChild(show.dom);
+			}
+			
+			function scrollRight(){
+				setIndex(index+1);
+			}
+			function scrollLeft(){
+				setIndex(index-1);
+			}
+			function setIndex(i){
+				if(i >= 0 && i <= shows.length){
+					shows[index].setSelected(false);
+					index = i;
+					ul.style.transform = "translate(" + (-index * 140 + 20) + "px, 0px)";
+					shows[index].setSelected(true);
+				}
+			}
+			
+			shows[index].setSelected(true)
+			
+			return {dom: dom,
+				scrollRight:scrollRight,
+				scrollLeft:scrollLeft}
+		}
+
+		function TVShowInfoBox(info){
+			var dom = document.createElement('li')
+			dom.className = "tv-show-item";
+			var screenImg = new Image();
+			var img = new Image()
+			img.onload = function(){
+				dom.style.backgroundImage = "url('"+info.images.poster+"')";
+				dom.className += " loaded";
+			}
+			img.src = info.images.poster;
+			screenImg.src = info.images.banner;
+			function setSelected(isSelected){
+				if(isSelected){
+					dom.className += " selected";
+					setBackgroundImage("url('"+info.images.banner+"')");
+				}
+				else
+					dom.className = dom.className.replace(/\s*selected/, "");
+			}
+			return {dom : dom, 
+					setSelected : setSelected
+				}
+		}
+		var bgImage
+		function setBackgroundImage(src){
+			if(!bgImage){
+				bgImage = document.createElement('div')
+				bgImage.className = 'bg-image-flasher';
+				bgImage.style.opacity = 0;
+				main_screen.appendChild(bgImage);
+			}
+			bgImage.style.backgroundImage = src;
+			var o = 0;
+			(function fadeIn(){
+				o += 0.1
+				bgImage.style.opacity = o;
+				if(o >= 1){
+					main_screen.style.backgroundImage = src
+					bgImage.style.opacity = 0;
+				}else
+					setTimeout(fadeIn, 50);
+			})()
+			
+		}
+		process.mainModule.exports.on_fingermote(function(data){
+			if(/right/.test(data))
+				show_collection.scrollRight();
+			else if(/left/.test(data))
+				show_collection.scrollLeft();
+		});
+	</script>
+  </body>
+</html>
